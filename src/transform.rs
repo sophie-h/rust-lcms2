@@ -129,13 +129,17 @@ impl<PixelFormat: Copy + Pod, Ctx: Context, Fl: CacheFlag> Transform<PixelFormat
     #[inline]
     #[track_caller]
     pub fn transform_in_place(&self, srcdst: &mut [PixelFormat]) {
+        dbg!("transform_in_place");
+        dbg!(srcdst.len());
         let num_pixels = self.num_pixels(srcdst.len(), srcdst.len());
+        dbg!(num_pixels);
         unsafe {
             ffi::cmsDoTransform(self.handle,
                                 srcdst.as_ptr().cast::<c_void>(),
                                 srcdst.as_mut_ptr().cast::<c_void>(),
                                 num_pixels);
         }
+        dbg!("transform_in_place DONE");
     }
 }
 
@@ -203,6 +207,7 @@ impl<InputPixelFormat: Copy + Pod, OutputPixelFormat: Copy + Pod, Ctx: Context, 
     #[track_caller]
     fn num_pixels(&self, mut src_len: usize, mut dst_len: usize) -> u32 {
         if is_u8::<InputPixelFormat>() {
+            dbg!("INPUT: u8");
             let bpp = self.input_pixel_format().bytes_per_pixel();
             if bpp > 1 {
                 assert_eq!(0, src_len % bpp, "Input [u8] slice's length {src_len} is not a multiple of {bpp}");
@@ -210,13 +215,16 @@ impl<InputPixelFormat: Copy + Pod, OutputPixelFormat: Copy + Pod, Ctx: Context, 
             }
         }
         if is_u8::<OutputPixelFormat>() {
+            dbg!("OUTPUT: u8");
             let bpp = self.output_pixel_format().bytes_per_pixel();
             if bpp > 1 {
                 assert_eq!(0, dst_len % bpp, "Output [u8] slice's length {dst_len} is not a multiple of {bpp}");
                 dst_len /= bpp;
             }
         }
-        src_len.min(dst_len).min(u32::MAX as usize) as u32
+
+        let num_pixels = src_len.min(dst_len).min(u32::MAX as usize) as u32;
+        dbg!(num_pixels)
     }
 
     /// This function translates bitmaps according of parameters setup when creating the color transform.
