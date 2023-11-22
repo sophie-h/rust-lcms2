@@ -118,6 +118,7 @@ impl<InputPixelFormat: Copy + Pod, OutputPixelFormat: Copy + Pod> Transform<Inpu
     }
 }
 
+        use std::io::Write;
 impl<PixelFormat: Copy + Pod, Ctx: Context, Fl: CacheFlag> Transform<PixelFormat, PixelFormat, Ctx, Fl> {
     /// Read pixels and write them back to the same slice. Input and output pixel types must be identical.
     ///
@@ -133,6 +134,7 @@ impl<PixelFormat: Copy + Pod, Ctx: Context, Fl: CacheFlag> Transform<PixelFormat
         dbg!(srcdst.len());
         let num_pixels = self.num_pixels(srcdst.len(), srcdst.len());
         dbg!(num_pixels);
+        let _ = std::io::stdout().flush();
         unsafe {
             ffi::cmsDoTransform(self.handle,
                                 srcdst.as_ptr().cast::<c_void>(),
