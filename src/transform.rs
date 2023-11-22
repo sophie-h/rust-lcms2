@@ -206,17 +206,21 @@ impl<InputPixelFormat: Copy + Pod, OutputPixelFormat: Copy + Pod, Ctx: Context, 
     #[inline]
     #[track_caller]
     fn num_pixels(&self, mut src_len: usize, mut dst_len: usize) -> u32 {
+        dbg!("INPUT: checking");
         if is_u8::<InputPixelFormat>() {
             dbg!("INPUT: u8");
-            let bpp = self.input_pixel_format().bytes_per_pixel();
+            let input_pixel_format = dbg!(self.input_pixel_format());
+            let bpp = dbg!(input_pixel_format.bytes_per_pixel());
             if bpp > 1 {
                 assert_eq!(0, src_len % bpp, "Input [u8] slice's length {src_len} is not a multiple of {bpp}");
                 src_len /= bpp;
             }
         }
+        dbg!("OUTPUT: checking");
         if is_u8::<OutputPixelFormat>() {
             dbg!("OUTPUT: u8");
-            let bpp = self.output_pixel_format().bytes_per_pixel();
+            let output_pixel_format = dbg!(self.output_pixel_format());
+            let bpp = dbg!(output_pixel_format.bytes_per_pixel());
             if bpp > 1 {
                 assert_eq!(0, dst_len % bpp, "Output [u8] slice's length {dst_len} is not a multiple of {bpp}");
                 dst_len /= bpp;
